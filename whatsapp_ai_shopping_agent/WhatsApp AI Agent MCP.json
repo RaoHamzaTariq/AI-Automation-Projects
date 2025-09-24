@@ -1,0 +1,789 @@
+{
+  "name": "WhatsApp AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        48
+      ],
+      "id": "4acddc85-c4d8-4c72-bdff-d95f708dfaeb",
+      "name": "WhatsApp Trigger",
+      "webhookId": "93d2dd8c-7e32-4951-9b2e-e5b82ac0cb4c",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "NsTZ7BpbwRbBMJxM",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are an AI Shopping Assistant for our E-commerce Store (BI Structure). \nYou have access to the following tools:\n1. get_products – Retrieve product details from the Products sheet.\n2. get_faqs – Retrieve answers from the FAQs sheet.\n3. create_order – Add a new customer order in the Orders sheet.\n4. get_order_status – Retrieve order status by OrderID.\n\nGuidelines:\n- When a customer asks about products, use get_products to return Name, Price, Stock, and Description.\n- When a customer asks a question, check FAQs first using get_faqs.\n- If a customer wants to place an order, use create_order and confirm details before saving.\n- If a customer asks about their order status, use get_order_status, Don't ask about order id. Just use order status tool\n- Always reply in a polite, clear, and professional way suitable for WhatsApp chat.\n",
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        32
+      ],
+      "id": "7604cc4e-b252-405e-8302-68090ccba81d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        336
+      ],
+      "id": "83487b98-bab7-4b82-a90f-6cf25f2703da",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CefEdpOBEXFHDJq8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "838801129305972",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        80,
+        32
+      ],
+      "id": "9adaf84a-dc4e-486a-a399-ebfcd65e3fcd",
+      "name": "Send message",
+      "webhookId": "5c72a591-908e-4fdd-ac8e-559324fd7d2a",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "MpD2xtZb4M8eT0Vz",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        320
+      ],
+      "id": "e6417973-a3ee-427e-bcb9-e8a9cb811721",
+      "name": "Simple Memory",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].text.body }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "7599fd36-a2b3-44c7-a3b2-dc31b3f0786f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d2cbd2cf-2a54-4150-8f52-b56b840f837f",
+                    "leftValue": "={{ $json.messages[0].audio.id}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1136,
+        48
+      ],
+      "id": "789120be-8685-496a-af6b-3146a4890fc6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "[\n  {\n    \"name\":\"Authentication\",\n    \"value\":\"EAAPej4u9SAwBPWOUtJ7SAMSNPvtUZAZBJDr9wtmQKiCLc9hcYKjZAG3v0uwcjXDffzVCXTY6ZCduAB8NuBpIrHHAL6MrJvJGuyC0aTLklWQfzEBHbj3QfIgS686HFbZBQGivqMhFcD5ZAMwqXCI5EtZAwR92xakgqwnIiazfat2Q1GZCxchROm57AxVPI1MRTGfLxNGHh8Ukm8aNpJXnxBm3KvVOeXUcy2ZA3pAX5fQz7wyNhigZDZD\"\n  }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -800,
+        592
+      ],
+      "id": "4f3db913-8612-4553-b42c-25272f722857",
+      "name": "HTTP Request",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "MpD2xtZb4M8eT0Vz",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $json.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        192
+      ],
+      "id": "3e4c4f1b-9428-4567-9b7f-55a2fc3a5ba4",
+      "name": "Download media",
+      "webhookId": "8f163947-e0a2-4bb2-9c2e-bbd21c56cb77",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "MpD2xtZb4M8eT0Vz",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-lite"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        592
+      ],
+      "id": "c0924857-7cea-492e-9509-572aa8de4947",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CefEdpOBEXFHDJq8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09500e48-9e42-4899-b4c6-d3e874e530a4",
+              "name": "text",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        192
+      ],
+      "id": "d248b965-daae-43a7-9298-966684e5fcfc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "05ba3251-30d3-45b9-a343-bbabe5317eef",
+              "name": "text",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -832,
+        32
+      ],
+      "id": "6d6eda68-87a9-42ba-91a8-d1b5c5a13882",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Place a new order into the Orders sheet.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo",
+          "mode": "list",
+          "cachedResultName": "Ecommerce Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2008979534,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit#gid=2008979534"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "CustomerName": "={{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}",
+            "ProductID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ProductID', ``, 'string') }}",
+            "Quantity": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity', ``, 'string') }}",
+            "Status": "=Pending",
+            "TotalAmount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('TotalAmount', `TotalAmount = Price * Quantity`, 'string') }}",
+            "Phone": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "OrderID",
+              "displayName": "OrderID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CustomerName",
+              "displayName": "CustomerName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ProductID",
+              "displayName": "ProductID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TotalAmount",
+              "displayName": "TotalAmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        432,
+        688
+      ],
+      "id": "bdc3313a-7835-40b9-adaf-f8017c903520",
+      "name": "PlaceOrders",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qi2UQGlJKVBQDSrP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Fetch specific product details by id or name when a customer asks about products.",
+        "documentId": {
+          "__rl": true,
+          "value": "11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo",
+          "mode": "list",
+          "cachedResultName": "Ecommerce Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1040578381,
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit#gid=1040578381"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ProductID",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            },
+            {
+              "lookupColumn": "Name",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values1_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        688
+      ],
+      "id": "4d8682d7-a04f-419c-8f54-758768af11b2",
+      "name": "GetSpecificProductData",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qi2UQGlJKVBQDSrP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Fetch all product details when a customer asks about products.",
+        "documentId": {
+          "__rl": true,
+          "value": "11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo",
+          "mode": "list",
+          "cachedResultName": "Ecommerce Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1040578381,
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit#gid=1040578381"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        688
+      ],
+      "id": "1d4b041f-e5cf-4e16-a93e-7552f555cf92",
+      "name": "GetAllProductsData",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qi2UQGlJKVBQDSrP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Answer common customer questions (FAQs)",
+        "documentId": {
+          "__rl": true,
+          "value": "11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo",
+          "mode": "list",
+          "cachedResultName": "Ecommerce Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1482131068,
+          "mode": "list",
+          "cachedResultName": "Faqs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit#gid=1482131068"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        704
+      ],
+      "id": "a574e413-c09f-4d31-870c-f47a07bf439d",
+      "name": "GetFaqs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qi2UQGlJKVBQDSrP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Google Sheets Tools \nThese are the tools used for handling the database queries",
+        "height": 368,
+        "width": 832
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        512
+      ],
+      "id": "299c075a-4ce0-403e-8f4a-04691e9dc4e7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Check status of a customer’s order.",
+        "documentId": {
+          "__rl": true,
+          "value": "11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo",
+          "mode": "list",
+          "cachedResultName": "Ecommerce Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2008979534,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11u-RqCe-OIzp803-L18QRARjfY-Zo2IZF-YcYOSVNHo/edit#gid=2008979534"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone",
+              "lookupValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        688
+      ],
+      "id": "9e52ffc9-d29e-45dd-bf48-f97009c6ae76",
+      "name": "GetOrderStatus",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qi2UQGlJKVBQDSrP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Transcribing a audio file\n \n",
+        "height": 240,
+        "width": 512
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        512
+      ],
+      "id": "6fa6f204-fc65-4990-a0d7-0543cefb32c9",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PlaceOrders": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetSpecificProductData": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetAllProductsData": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetFaqs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetOrderStatus": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "63f97536-83ff-4b70-8025-06b240d7d09f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "328e20b46f75bee8b4efce7a30b8167b68f2766e72bda0f497e1b95152df26f6"
+  },
+  "id": "JLNzGP6HFSgkuSUN",
+  "tags": []
+}

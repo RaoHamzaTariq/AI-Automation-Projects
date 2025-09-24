@@ -1,0 +1,621 @@
+{
+  "name": "Leads Outreaching Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        320,
+        368
+      ],
+      "id": "28af84b3-5031-49c8-ab31-668a45eace4f",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CefEdpOBEXFHDJq8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "0559e52d-ba39-46d9-95d5-fe00a0ee59de",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Services Offered: \n{{ $json['Services Offered'] }}\n\nDescription is:\n\n{{ $json['Description of Services'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an AI assistant tasked with writing a one-line description of an e-commerce business based on a user-provided description. Your output will be used to complete the following sentence:\n\nOur AI chatbots and virtual agents provide 24/7 automated support, helping answer frequent questions about [...]**\n\nInstructions:\n\nOnly write the part that comes after “about” — do not include the full sentence.\nUse only the information provided in the user’s business description.\nYour output must be a concise, one-line continuation that fits naturally after the word about.\nDo not include the word \"about\" in your output.\nDo not add any extra explanation, promotional language, or rewrite any other part of the proposal.\n\nExample:\n\nIf the business is a baby food subscription brand, your output should be:\nsubscriptions, delivery, product ingredients, babies’ developmental milestones, and more\n\nDo not write:\nThe full sentence\nAny text before or including the word about\nAny additional commentary\n\nOnly return the continuation line. Don't use the ... dots and any other sign to show continuation\n"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        288,
+        208
+      ],
+      "id": "c31c1206-0343-43d4-b0e0-64b90e4571e2",
+      "name": "AI For description"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "13PFuvgfc-BBYM0B2raomhfgptZ2lKPJXwwXZdUBdBEU",
+          "mode": "list",
+          "cachedResultName": "Linkedin Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13PFuvgfc-BBYM0B2raomhfgptZ2lKPJXwwXZdUBdBEU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 191866126,
+          "mode": "list",
+          "cachedResultName": "Educations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13PFuvgfc-BBYM0B2raomhfgptZ2lKPJXwwXZdUBdBEU/edit#gid=191866126"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email sent": "yes",
+            "Web Address": "={{ $('Loop Over Items').item.json['Web Address'] }}"
+          },
+          "matchingColumns": [
+            "Web Address"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Web Address",
+              "displayName": "Web Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email sent",
+              "displayName": "email sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Post Code",
+              "displayName": "Post Code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contact Tel",
+              "displayName": "Contact Tel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Services Offered",
+              "displayName": "Services Offered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Description of Services",
+              "displayName": "Description of Services",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1104,
+        208
+      ],
+      "id": "fea1bdb6-e087-4393-a6e4-c4055701cb4f",
+      "name": "Marks the email sent",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qi2UQGlJKVBQDSrP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        208
+      ],
+      "id": "c7659c50-0659-4579-8c40-6ffcbf0cd3c7",
+      "name": "Limit to 10"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9f9c9506-222f-40d7-8284-574ac99dee0b",
+              "leftValue": "={{ $json['email sent'] }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "86367969-7258-4ebd-997a-ea441e2db7fb",
+              "leftValue": "={{ $json[\"Email Address\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        208
+      ],
+      "id": "08d49baf-3231-4739-bcf0-50e4479a539b",
+      "name": "Filter the data"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13PFuvgfc-BBYM0B2raomhfgptZ2lKPJXwwXZdUBdBEU",
+          "mode": "list",
+          "cachedResultName": "Linkedin Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13PFuvgfc-BBYM0B2raomhfgptZ2lKPJXwwXZdUBdBEU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 191866126,
+          "mode": "list",
+          "cachedResultName": "Educations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13PFuvgfc-BBYM0B2raomhfgptZ2lKPJXwwXZdUBdBEU/edit#gid=191866126"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -464,
+        208
+      ],
+      "id": "44a1971e-a47b-4d60-a1a0-2fdeb23999e9",
+      "name": "Get the whole Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qi2UQGlJKVBQDSrP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        432
+      ],
+      "id": "55219615-79ad-49ee-8a75-1a7d99470b3d",
+      "name": "Wait for 10",
+      "webhookId": "baf7cd59-8f56-427d-b922-0109b9d143a4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b1883867-e483-4cbb-bd86-5b79aecc418b",
+              "leftValue": "={{ $('Loop Over Items').item.json.is_odd }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        208
+      ],
+      "id": "0a17b76b-a0b6-4c55-ac35-a6f383a80cb7",
+      "name": "HTML or Text"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Loop Over Items').item.json['Email Address'] }}",
+        "subject": "=AI Chatbots for {{ $('Loop Over Items').item.json['Company Name'] }} – Faster Answers for Students & Parents",
+        "message": "=<p>Hi <strong>{{ $('Loop Over Items').item.json['Company Name'] }}</strong> Team,</p>\n\n<p>My name is Rao Hamza Tariq from <strong>BI Structure</strong>. We create AI-powered chatbots and support systems designed for the education sector, including schools, training centers, academies, and consultancies.</p>\n\n<p>Many education providers today receive a high number of questions from students, parents, and learners. This often creates long waiting times and extra work for staff. Our AI chatbots — including <strong>WhatsApp chatbots</strong> — work 24/7 to answer common questions about {{ $('AI For description').item.json.text }} and provide instant support anytime.</p>\n\n<h3>Here’s how our AI and WhatsApp chatbots can help your organization:</h3>\n<ul>\n  <li>24/7 instant replies for FAQs such as admissions, courses, schedules, fees, and learning options.</li>\n  <li>Support available directly on your website and on WhatsApp, where most students and parents already connect.</li>\n  <li>Handle up to 70–80% of simple questions automatically, reducing staff workload.</li>\n  <li>Pass complex or personal cases to your team when needed.</li>\n</ul>\n\n<h3>Main benefits:</h3>\n<ul>\n  <li>Faster responses for students and parents, improving satisfaction and trust.</li>\n  <li>Lower costs by automating repetitive queries.</li>\n  <li>More time for staff to focus on teaching, counseling, or important tasks.</li>\n</ul>\n\n<p>On average, education organizations save <strong>30–50%</strong> in support costs and increase satisfaction by <strong>20%</strong> after using AI chatbots. Some even improved enrollments and student engagement with WhatsApp-based support.</p>\n\n<p>We provide fully customizable AI chatbots that integrate with your website and WhatsApp. We handle setup, integration, and ongoing support so you can focus on education. If you’re looking to save time, reduce workload, and improve student services with AI, we’d be glad to help.</p>\n\n<h3>See Our Work:</h3>\n<p>Explore our portfolio showcasing AI chatbot implementations: \n<a href=\"https://rao-hamza-tariq.vercel.app/portfolios/ai-powered-multi-agent-system-for-ecommerce-bi-structure-nike-marketplace\" target=\"_blank\">Portfolio Project Link</a></p>\n\n<p>Would you be open to a short call or demo to see how our AI + WhatsApp chatbot solutions can support <strong>{{ $('Loop Over Items').item.json['Company Name'] }}</strong>?</p>\n\n<p>Thank you for your time. I look forward to connecting.</p>\n\n<p>Best Regards,<br>\n<strong>Rao Hamza Tariq</strong><br>\nAgentic AI Developer | BI Structure<br>\n<a href=\"https://rao-hamza-tariq.vercel.app/\">https://rao-hamza-tariq.vercel.app/</a><br>\n<a href=\"https://www.upwork.com/freelancers/~01c73bcca9bafbd6b9\">Upwork Link</a><br>\n<a href=\"https://www.linkedin.com/in/rao-hamza-tariq/\">LinkedIn Link</a></p>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "BI Structure"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        320
+      ],
+      "id": "fe397b11-16db-4cf3-87aa-907ef6b2d753",
+      "name": "Gmail Text",
+      "webhookId": "f303adc3-2ad5-49b4-b619-073b97d117c0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NwqehdBcGyD1QgGm",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"is_odd\" :{{ ($json.row_number) % 2 !== 0 }}\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5ecdf345-e43e-40cd-865e-611e388e83b4",
+      "name": "Add isOdd Field"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Loop Over Items').item.json['Email Address'] }}",
+        "subject": "=AI Chatbots for {{ $('Loop Over Items').item.json['Company Name'] }} – Faster Answers for Students & Parents",
+        "message": "=<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"UTF-8\">\n    <title>AI Chatbots for Education Websites & WhatsApp</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  </head>\n  <body style=\"margin:0; padding:0; background-color: #667eea; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; color:#1a1a1a;\">\n    <!-- Main Wrapper -->\n    <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#667eea\" style=\"background-color: #667eea;\">\n      <tr>\n        <td align=\"center\" style=\"padding: 40px 20px;\">\n          <!-- Container -->\n          <table width=\"640\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"background-color: #ffffff; max-width: 640px; border-collapse: collapse;\">\n            \n            <!-- Header with Gradient -->\n            <tr>\n              <td bgcolor=\"#1e3c72\" style=\"background-color: #1e3c72; padding: 0;\">\n                <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                  <tr>\n                    <td align=\"center\" style=\"padding: 40px 20px;\">\n                      <div style=\"width: 60px; height: 4px; background-color: #00d4ff; margin: 0 auto 24px; border-radius: 2px;\"></div>\n                      <h1 style=\"margin: 0; font-size: 28px; font-weight: 700; color: #ffffff;\">Boost Student & Parent Support with AI Chatbots</h1>\n                      <p style=\"margin: 16px 0 0; font-size: 18px; color: rgba(255,255,255,0.9);\">Smart website chatbots with optional WhatsApp integration</p>\n                    </td>\n                  </tr>\n                </table>\n              </td>\n            </tr>\n\n            <!-- Main Content -->\n            <tr>\n              <td style=\"padding: 40px; font-size: 16px; line-height: 1.7; color: #2d3748;\">\n                <p style=\"margin: 0 0 24px; font-size: 17px;\">Hi <strong style=\"color: #1e3c72;\">{{ $('Loop Over Items').item.json['Company Name'] }}</strong> Team,</p>\n                \n                <p style=\"margin: 0 0 24px;\">\n                  I'm <strong>Rao Hamza Tariq</strong> from <strong style=\"color: #1e3c72;\">BI Structure</strong>. We design AI chatbots for education websites that provide <strong>24/7 instant answers</strong> to students and parents, and we also offer <strong>WhatsApp chatbot support</strong> for added convenience.\n                </p>\n                \n                <p style=\"margin: 0 0 32px;\">\n                  Our chatbots can instantly answer questions about <strong>{{ $('AI For description').item.json.text }}</strong>, while smoothly passing more complex cases to your staff. This helps reduce repetitive work and improve response time for your team.\n                </p>\n              </td>\n            </tr>\n\n            <!-- Features Section -->\n            <tr>\n              <td bgcolor=\"#f8fafc\" style=\"background-color: #f8fafc; padding: 40px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;\">\n                <h3 style=\"color: #1e3c72; margin: 0 0 32px; text-align: center; font-size: 22px; font-weight: 700;\">How Our Chatbots Help Education Providers</h3>\n                \n                <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                  <tr>\n                    <td width=\"33%\" align=\"center\" valign=\"top\" style=\"padding: 0 15px;\">\n                      <div style=\"background-color: #4f46e5; width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 20px; text-align: center; line-height: 56px;\">\n                        <span style=\"color: white; font-size: 20px; font-weight: bold;\">24/7</span>\n                      </div>\n                      <p style=\"margin: 0; font-size: 15px; color: #4a5568; text-align: center;\">\n                        <strong style=\"color: #2d3748; display: block;\">Website Chatbot</strong>\n                        Always-on answers for admissions, fees, courses, and schedules\n                      </p>\n                    </td>\n                    <td width=\"33%\" align=\"center\" valign=\"top\" style=\"padding: 0 15px;\">\n                      <div style=\"background-color: #06b6d4; width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 20px; text-align: center; line-height: 56px;\">\n                        <span style=\"color: white; font-size: 20px; font-weight: bold;\">80%</span>\n                      </div>\n                      <p style=\"margin: 0; font-size: 15px; color: #4a5568; text-align: center;\">\n                        <strong style=\"color: #2d3748; display: block;\">Smart Automation</strong>\n                        Handles 70–80% of routine questions automatically\n                      </p>\n                    </td>\n                    <td width=\"33%\" align=\"center\" valign=\"top\" style=\"padding: 0 15px;\">\n                      <div style=\"background-color: #10b981; width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 20px; text-align: center; line-height: 56px;\">\n                        <span style=\"color: white; font-size: 24px; font-weight: bold;\">WA</span>\n                      </div>\n                      <p style=\"margin: 0; font-size: 15px; color: #4a5568; text-align: center;\">\n                        <strong style=\"color: #2d3748; display: block;\">WhatsApp Option</strong>\n                        Give students and parents the choice to chat on WhatsApp too\n                      </p>\n                    </td>\n                  </tr>\n                </table>\n              </td>\n            </tr>\n\n            <!-- ROI Section -->\n            <tr>\n              <td style=\"padding: 40px;\">\n                <h3 style=\"color: #1e3c72; margin: 0 0 32px; text-align: center; font-size: 22px; font-weight: 700;\">Why Schools & Institutes Use Our Chatbots</h3>\n                \n                <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                  <tr>\n                    <td width=\"50%\" valign=\"top\" style=\"padding-right: 10px; padding-bottom: 16px;\">\n                      <div style=\"background-color: #fef3c7; padding: 24px; border-left: 4px solid #f59e0b;\">\n                        <h4 style=\"margin: 0 0 8px; color: #92400e; font-size: 18px; font-weight: 700;\">Save Time & Cost</h4>\n                        <p style=\"margin: 0; color: #78350f; font-size: 15px;\">Cut inquiry workload and reduce support costs by <strong>30–50%</strong></p>\n                      </div>\n                    </td>\n                    <td width=\"50%\" valign=\"top\" style=\"padding-left: 10px; padding-bottom: 16px;\">\n                      <div style=\"background-color: #dcfce7; padding: 24px; border-left: 4px solid #10b981;\">\n                        <h4 style=\"margin: 0 0 8px; color: #047857; font-size: 18px; font-weight: 700;\">Better Experience</h4>\n                        <p style=\"margin: 0; color: #065f46; font-size: 15px;\">Increase student & parent satisfaction with faster responses</p>\n                      </div>\n                    </td>\n                  </tr>\n                </table>\n                \n                <div style=\"background-color: #ede9fe; padding: 24px; border-left: 4px solid #8b5cf6; text-align: center;\">\n                  <h4 style=\"margin: 0 0 8px; color: #6b21a8; font-size: 18px; font-weight: 700;\">Staff Productivity</h4>\n                  <p style=\"margin: 0; color: #581c87; font-size: 15px;\">Let your team focus on teaching & counseling, not repetitive queries</p>\n                </div>\n              </td>\n            </tr>\n\n            <!-- Success Story -->\n            <tr>\n              <td bgcolor=\"#1e293b\" style=\"background-color: #1e293b; padding: 40px; color: #e2e8f0;\">\n                <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                  <tr>\n                    <td align=\"center\">\n                      <div style=\"width: 60px; height: 4px; background-color: #00d4ff; margin: 0 auto 24px; border-radius: 2px;\"></div>\n                      <h4 style=\"margin: 0 0 20px; color: #ffffff; font-size: 20px; font-weight: 700;\">Real Results</h4>\n                      <p style=\"margin: 0; font-size: 17px; line-height: 1.6; font-style: italic;\">\n                        \"A training institute automated <strong style=\"color: #00d4ff;\">50% of inquiries</strong> on their website and improved enrollments with optional WhatsApp chatbot support.\"\n                      </p>\n                    </td>\n                  </tr>\n                </table>\n              </td>\n            </tr>\n\n            <!-- CTA Section -->\n            <tr>\n              <td align=\"center\" style=\"padding: 50px 40px; background-color: #ffffff;\">\n                <h3 style=\"margin: 0 0 32px; color: #1e3c72; font-size: 24px; font-weight: 700;\">Ready to Add AI Chatbots to Your Website?</h3>\n                \n                <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                  <tr>\n                    <td align=\"center\" style=\"padding: 0 10px 20px;\">\n                      <a href=\"https://rao-hamza-tariq.vercel.app/portfolios/ai-powered-multi-agent-system-for-ecommerce-bi-structure-nike-marketplace\" \n                         target=\"_blank\"\n                         style=\"display: inline-block; background-color: #1e3c72; color: #ffffff; text-decoration: none; \n                                padding: 16px 32px; font-weight: 600; font-size: 16px;\">\n                        View Our Portfolio →\n                      </a>\n                    </td>\n                  </tr>\n                  <tr>\n                    <td align=\"center\" style=\"padding: 0 10px 20px;\">\n                      <a href=\"https://rao-hamza-tariq.vercel.app/Contact\" \n                         target=\"_blank\"\n                         style=\"display: inline-block; background-color: #f59e0b; color: #ffffff; text-decoration: none; \n                                padding: 16px 32px; font-weight: 600; font-size: 16px;\">\n                        Schedule Demo →\n                      </a>\n                    </td>\n                  </tr>\n                </table>\n                \n                <p style=\"margin: 20px 0 0; font-size: 14px; color: #6b7280;\">\n                  No commitment • Free 15-min consultation • Custom chatbot design\n                </p>\n              </td>\n            </tr>\n\n            <!-- Footer -->\n            <tr>\n              <td bgcolor=\"#111827\" style=\"background-color: #111827; padding: 32px 40px; color: #d1d5db;\">\n                <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                  <tr>\n                    <td width=\"70%\" valign=\"top\">\n                      <p style=\"margin: 0 0 8px; font-size: 18px; font-weight: 700; color: #ffffff;\">Rao Hamza Tariq</p>\n                      <p style=\"margin: 0 0 4px; font-size: 14px; color: #9ca3af;\">Agentic AI Developer</p>\n                      <p style=\"margin: 0 0 16px; font-size: 14px; color: #6366f1; font-weight: 600;\">BI Structure</p>\n                      <a href=\"https://rao-hamza-tariq.vercel.app/\" \n                         style=\"color: #60a5fa; text-decoration: none; font-size: 14px; display: block; margin-bottom: 8px;\">\n                        rao-hamza-tariq.vercel.app →\n                      </a>\n                      <a href=\"https://www.upwork.com/freelancers/~01a336a2b48b4ad7f3\" \n                         style=\"color: #60a5fa; text-decoration: none; font-size: 14px; display: block; margin-bottom: 8px;\">\n                        Upwork Profile →\n                      </a>\n                      <a href=\"https://www.linkedin.com/in/rao-hamza-tariq-365b19225/\" \n                         style=\"color: #60a5fa; text-decoration: none; font-size: 14px; display: block;\">\n                        LinkedIn Profile →\n                      </a>\n                    </td>\n                    <td width=\"30%\" align=\"right\" valign=\"top\">\n                      <div style=\"background-color: #6366f1; width: 80px; height: 80px; border-radius: 20px; text-align: center; line-height: 80px;\">\n                        <span style=\"color: white; font-size: 32px; font-weight: bold;\">AI</span>\n                      </div>\n                    </td>\n                  </tr>\n                </table>\n              </td>\n            </tr>\n\n          </table>\n        </td>\n      </tr>\n    </table>\n  </body>\n</html>\n",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "BI Structure"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        96
+      ],
+      "id": "612e9fd2-3554-463c-8902-5e5e4b3b9e49",
+      "name": "Gmail HTML",
+      "webhookId": "f303adc3-2ad5-49b4-b619-073b97d117c0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NwqehdBcGyD1QgGm",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 12,
+              "triggerAtMinute": 47
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        208
+      ],
+      "id": "367240c7-9f49-4327-bd16-11ff3342a4ed",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI For description",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI For description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI For description": {
+      "main": [
+        [
+          {
+            "node": "HTML or Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marks the email sent": {
+      "main": [
+        [
+          {
+            "node": "Wait for 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit to 10": {
+      "main": [
+        [
+          {
+            "node": "Add isOdd Field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter the data": {
+      "main": [
+        [
+          {
+            "node": "Limit to 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the whole Data": {
+      "main": [
+        [
+          {
+            "node": "Filter the data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for 10": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML or Text": {
+      "main": [
+        [
+          {
+            "node": "Gmail Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Text": {
+      "main": [
+        [
+          {
+            "node": "Marks the email sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add isOdd Field": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail HTML": {
+      "main": [
+        [
+          {
+            "node": "Marks the email sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get the whole Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1c3acb4f-4d63-42a8-b29f-fa789ea8133e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "328e20b46f75bee8b4efce7a30b8167b68f2766e72bda0f497e1b95152df26f6"
+  },
+  "id": "PKhIjYbB54D6Fimz",
+  "tags": []
+}
