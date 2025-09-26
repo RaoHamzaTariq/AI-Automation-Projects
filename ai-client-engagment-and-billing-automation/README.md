@@ -12,7 +12,7 @@ A clean dashboard where staff can:
 - Create invoices linked to clients
 - Track payments and outstanding dues
 
-![Dashboard Screenshot](images/dashboard.png)
+![Dashboard Screenshot](/public/Dashboard%20Page.png)
 
 ### Automation Workflows
 n8n workflows handle client emails, invoices, and payment reminders automatically.
@@ -53,6 +53,7 @@ This system **automates the entire cycle**:
 
 ![Send Welcome Emails to New Leads Pic](/public/Send%20Email%20to%20Lead.PNG)
 
+![](/public//Leads%20Management%20Page.png)
 ---
 
 ### 2. Follow-Up Emails
@@ -61,6 +62,8 @@ This system **automates the entire cycle**:
 - This increases the chance of converting leads without manual effort.  
 
 ![Follow-up Emails Pic](/public/Follows%20Up%20Email.PNG)
+
+![](/public/Email%20Campaign%20Page.png)
 
 ---
 
@@ -73,6 +76,7 @@ This system **automates the entire cycle**:
 
 ![Invoice Creation Pic](/public/Invoice%20Flow.PNG)
 
+![](/public//Invoice%20Management%20Page.png)
 ---
 
 ### 4. Payment Reminders
@@ -82,6 +86,7 @@ This system **automates the entire cycle**:
 
 ![Payment Reminders](/public/Invoice%20Reminder%20After%20Due%20Date.PNG)
 
+![](/public/Transaction%20History%20Page.png)
 ---
 
 ## Real Use Case Example
