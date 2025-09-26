@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  /* Brand colors */
+  --color-brand: #4f46e5; /* indigo-600 */
+  --color-brand-2: #7c3aed; /* purple-600 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Utility input class used across pages */
+.input {
+  @apply px-3 py-2 rounded-lg border border-gray-200 bg-white/80 backdrop-blur placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition;
+}
+
+/* Elevate cards */
+.card {
+  @apply bg-white/80 dark:bg-white/5 backdrop-blur border border-white/40 shadow-xl rounded-2xl;
+}
+
+/* Headings */
+.page-title {
+  @apply text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+}
+
+/* Tables */
+.table {
+  @apply min-w-full table-auto border-collapse rounded-xl overflow-hidden;
+}
+.table thead {
+  @apply bg-gray-100/80;
+}
+.table th, .table td {
+  @apply p-3 border border-gray-200;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow hover:opacity-90 disabled:opacity-60;
+}
+.btn-outline {
+  @apply px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50;
+}

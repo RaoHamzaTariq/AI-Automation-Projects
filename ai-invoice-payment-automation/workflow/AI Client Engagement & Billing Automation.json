@@ -1,0 +1,1545 @@
+{
+  "name": "AI Client Engagement & Billing Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"The subject line of the email.\"\n    },\n    \"body\": {\n      \"type\": \"string\",\n      \"description\": \"The main content of the email, including introduction, problem-solving message, market stats, and closing.\"\n    }\n  },\n  \"required\": [\"subject\", \"body\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -704,
+        -160
+      ],
+      "id": "ff5c876b-2069-4d5c-ae4f-ede18f39d53a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        -160
+      ],
+      "id": "8650f409-46be-4149-bf81-fa3b9bc69cd2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GbKkx3nLrA5uwRMN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1088,
+        176
+      ],
+      "id": "3faabb04-cc72-4ca4-9b44-090c953fe65d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -496,
+        176
+      ],
+      "id": "131988ec-dcb2-4306-8b55-d1bddd20c1fd",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"The subject line of the email.\"\n    },\n    \"body\": {\n      \"type\": \"string\",\n      \"description\": \"The main content of the email, including introduction, problem-solving message, market stats, and closing.\"\n    }\n  },\n  \"required\": [\"subject\", \"body\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        368
+      ],
+      "id": "28fdd26e-3954-4c59-96a4-628952f9b251",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        384
+      ],
+      "id": "cedad07f-728a-4b85-8070-36bf930e144d",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GbKkx3nLrA5uwRMN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        368
+      ],
+      "id": "2b71a14c-50ce-486a-85ab-b7257fbe61df",
+      "name": "Wait",
+      "webhookId": "7ae523c9-04ac-494d-9add-2acf5bde47cf"
+    },
+    {
+      "parameters": {
+        "content": "## Send Email to Leads\nAfter receiving the new leads it send the email and and add it in Supabase",
+        "height": 496,
+        "width": 1168
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        -464
+      ],
+      "id": "ce561bf1-5bd2-4439-a0a4-1723c1198dbe",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Follows Up Email\nBased on schedule, it get supabase data and send the reminder to correct leads.",
+        "height": 528,
+        "width": 1712
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        64
+      ],
+      "id": "9c48c97a-1b5d-4760-bcd6-50b092e5fa16",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Invoice Flow\nAfter receiving the invoice data, it create the invoice and send to the client.",
+        "height": 496,
+        "width": 1648
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -464
+      ],
+      "id": "e5e87979-d9ae-4950-8818-e6654a74864f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1136,
+        720
+      ],
+      "id": "fabdf5cf-899e-4065-b8e5-e55e4dfc4aae",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -688,
+        736
+      ],
+      "id": "786e3e64-6075-4ef1-9979-5ba9b3b44e26",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"The subject line of the email.\"\n    },\n    \"body\": {\n      \"type\": \"string\",\n      \"description\": \"The main content of the email, including introduction, problem-solving message, market stats, and closing.\"\n    }\n  },\n  \"required\": [\"subject\", \"body\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        896
+      ],
+      "id": "2b32f24d-c393-4b2d-9c46-7318e3424496",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        896
+      ],
+      "id": "2b7f57ed-dde7-46e3-9c10-46247cb32769",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GbKkx3nLrA5uwRMN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        1024
+      ],
+      "id": "d379ea49-e966-488d-a730-fde9fe78c758",
+      "name": "Wait1",
+      "webhookId": "7ae523c9-04ac-494d-9add-2acf5bde47cf"
+    },
+    {
+      "parameters": {
+        "content": "## Invoice Reminder After Due Date\nBased on schedule, it get supabase data and send the reminder to correct client about paying the invoice.",
+        "height": 624,
+        "width": 2064
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        624
+      ],
+      "id": "3c4286e7-e913-461a-8af8-9cca1579cb06",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"The subject line of the email.\"\n    },\n    \"body\": {\n      \"type\": \"string\",\n      \"description\": \"The main content of the email, including introduction, problem-solving message, market stats, and closing.\"\n    }\n  },\n  \"required\": [\"subject\", \"body\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        -144
+      ],
+      "id": "4c5073a1-38bb-49eb-a560-ff5702a73540",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -160
+      ],
+      "id": "7c1cdbf8-d9d3-4288-befe-c403f0ad3fa4",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GbKkx3nLrA5uwRMN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Leads Creation Webhook').item.json.body.lead.email }}",
+        "subject": "={{ $json.output.subject }}",
+        "message": "={{ $json.output.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        -368
+      ],
+      "id": "8e7293e2-8c8a-41aa-8d4f-99ba3b6fa946",
+      "name": "Send Email",
+      "webhookId": "ee85bc17-1c7c-41a3-80f4-6002309c50da",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tcBH6xvyVdN1Xcr0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "emails",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Leads Creation Webhook').item.json.body.lead.id }}"
+            },
+            {
+              "fieldId": "subject",
+              "fieldValue": "={{ $('AI Agent For Marketing').item.json.output.subject }}"
+            },
+            {
+              "fieldId": "body",
+              "fieldValue": "={{ $('AI Agent For Marketing').item.json.output.body }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "sent"
+            },
+            {
+              "fieldId": "sent_at",
+              "fieldValue": "={{ $now.format('yyyy-MM-dd hh:mm:ss') }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $now.format('yyyy-MM-dd hh:mm:ss') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -368
+      ],
+      "id": "f593d13c-c0fe-46d4-b88b-5e8a1e2fbf9e",
+      "name": "Email Creation in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1rIV4ShsviQAafgQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-reminder",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1072,
+        -368
+      ],
+      "id": "278af234-11ea-4b64-a53b-479f516683c3",
+      "name": "Leads Creation Webhook",
+      "webhookId": "7c49a431-1621-4c40-be62-ca0ae3cbf5b7"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-invoice",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        48,
+        -352
+      ],
+      "id": "7ba4530f-1203-43d6-96ba-3a62c623ad9d",
+      "name": "Invoice Creation Webhook",
+      "webhookId": "7c49a431-1621-4c40-be62-ca0ae3cbf5b7"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.body.lead_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -192
+      ],
+      "id": "e0755b86-a3cd-4285-a448-8e4dcee0a77d",
+      "name": "Get Client Data",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1rIV4ShsviQAafgQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1a3127dd-8834-412d-9673-68590f655988",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "15b73c38-3242-4519-a51e-b347958059ca",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "e265fe6c-c6d3-489e-b601-bc718ca0f841",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "484ec6d5-fa30-4b85-bfbb-3c585861fbc4",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "dd1a27b7-70ab-4fe1-9900-92018eda1700",
+              "name": "amount",
+              "value": "={{ $('Invoice Creation Webhook').item.json.body.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "8ae190f7-34f7-4df4-8ee3-9ab6b828ff9a",
+              "name": "currency",
+              "value": "={{ $('Invoice Creation Webhook').item.json.body.currency }}",
+              "type": "string"
+            },
+            {
+              "id": "3bd27622-02ae-4ccc-8d9b-7c68143468d7",
+              "name": "due_date",
+              "value": "={{ $('Invoice Creation Webhook').item.json.body.due_date }}",
+              "type": "string"
+            },
+            {
+              "id": "b50d247d-5fc8-4cd4-978b-3c28c3c0a3a7",
+              "name": "issued_at",
+              "value": "={{ $('Invoice Creation Webhook').item.json.body.issued_at }}",
+              "type": "string"
+            },
+            {
+              "id": "543cacfd-f1f7-4dbe-896e-dc2e8e0571fc",
+              "name": "status",
+              "value": "={{ $('Invoice Creation Webhook').item.json.body.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        -336
+      ],
+      "id": "3924889c-f22f-4332-9664-5d6afcbf51fc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Invoice</title>\n  <style>\n    body {\n      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n      margin: 40px;\n      color: #333;\n      background-color: #f9f9f9;\n    }\n    .invoice-box {\n      max-width: 850px;\n      margin: auto;\n      background: #fff;\n      border: 1px solid #ddd;\n      padding: 40px;\n      box-shadow: 0 0 10px rgba(0,0,0,0.1);\n      font-size: 15px;\n      line-height: 22px;\n      color: #444;\n    }\n    .header {\n      display: flex;\n      justify-content: space-between;\n      align-items: flex-start;\n      border-bottom: 2px solid #0066cc;\n      padding-bottom: 20px;\n      margin-bottom: 30px;\n    }\n    .company h2 {\n      margin: 0;\n      color: #0066cc;\n    }\n    .company p {\n      margin: 2px 0;\n    }\n    .invoice-details {\n      text-align: right;\n    }\n    .invoice-details h3 {\n      margin: 0;\n      color: #333;\n    }\n    .invoice-details p {\n      margin: 4px 0;\n    }\n    h3.section-title {\n      margin-top: 30px;\n      margin-bottom: 10px;\n      color: #0066cc;\n      border-bottom: 1px solid #ddd;\n      padding-bottom: 5px;\n    }\n    table {\n      width: 100%;\n      border-collapse: collapse;\n      margin-top: 20px;\n    }\n    table th, table td {\n      border: 1px solid #ddd;\n      padding: 12px;\n      text-align: left;\n    }\n    table th {\n      background-color: #0066cc;\n      color: #fff;\n      font-weight: 600;\n    }\n    table td {\n      background-color: #fafafa;\n    }\n    .totals {\n      margin-top: 30px;\n      float: right;\n      width: 300px;\n    }\n    .totals table {\n      border: none;\n    }\n    .totals td {\n      padding: 8px;\n      text-align: right;\n    }\n    .totals td:first-child {\n      text-align: left;\n    }\n    .totals tr:last-child td {\n      font-size: 16px;\n      font-weight: bold;\n      border-top: 2px solid #0066cc;\n    }\n    .footer {\n      margin-top: 60px;\n      text-align: center;\n      font-size: 13px;\n      color: #777;\n      border-top: 1px solid #ddd;\n      padding-top: 15px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"invoice-box\">\n    <!-- Header -->\n    <div class=\"header\">\n      <div class=\"company\">\n        <h2>BI Structure</h2>\n        <p>Garden West, Karachi, Pakistan</p>\n        <p>Email: bistructure9211@gmail.com</p>\n      </div>\n      <div class=\"invoice-details\">\n        <h3>Invoice</h3>\n        <p><strong>Client ID:</strong> {{$('Edit Fields').item.json.id}}</p>\n        <p><strong>Issued Date:</strong> {{$('Edit Fields').item.json.issued_at}}</p>\n        <p><strong>Due Date:</strong> {{$('Edit Fields').item.json.due_date}}</p>\n      </div>\n    </div>\n\n    <!-- Bill To -->\n    <div>\n      <h3 class=\"section-title\">Bill To</h3>\n      <p><strong>{{$('Edit Fields').item.json.name}}</strong></p>\n      <p>{{$('Edit Fields').item.json.email}}</p>\n    </div>\n\n    <!-- Items Table -->\n    <table>\n      <tr>\n        <th>Description</th>\n        <th>Qty</th>\n        <th>Unit Price</th>\n        <th>Total</th>\n      </tr>\n      <tr>\n        <td>Service / Product</td>\n        <td>1</td>\n        <td>{{$('Edit Fields').item.json.amount}} {{$('Edit Fields').item.json.currency}}</td>\n        <td>{{$('Edit Fields').item.json.amount}} {{$('Edit Fields').item.json.currency}}</td>\n      </tr>\n    </table>\n\n    <!-- Totals -->\n    <div class=\"totals\">\n      <table>\n        <tr>\n          <td>Subtotal:</td>\n          <td>{{$('Edit Fields').item.json.amount}} {{$('Edit Fields').item.json.currency}}</td>\n        </tr>\n        <tr>\n          <td>Tax (if applicable):</td>\n          <td>0.00 {{$('Edit Fields').item.json.currency}}</td>\n        </tr>\n        <tr>\n          <td>Total:</td>\n          <td>{{$('Edit Fields').item.json.amount}} {{$('Edit Fields').item.json.currency}}</td>\n        </tr>\n      </table>\n    </div>\n    <div style=\"clear: both;\"></div>\n\n    <!-- Footer -->\n    <div class=\"footer\">\n      <p>Thank you for your business!</p>\n      <p>Please ensure payment is made by the due date to avoid late fees.</p>\n    </div>\n  </div>\n</body>\n</html>\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        -336
+      ],
+      "id": "9ba91af8-8724-47dc-9992-5de838b7f870",
+      "name": "Invoice Template"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.html // your HTML string\nconst base64 = Buffer.from(html).toString('base64');\n\nreturn [\n  {\n    json: {\n      Parameters: [\n        {\n          Name: \"File\",\n          FileValue: {\n            Name: \"my_file.html\",\n            Data: base64\n          }\n        },\n        {\n          Name: \"StoreFile\",\n          Value: true\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -336
+      ],
+      "id": "2ec8a195-4fd6-431d-870b-5fb7332ef703",
+      "name": "JSON for ConvertAPI"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://v2.convertapi.com/convert/html/to/pdf",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -336
+      ],
+      "id": "e6e0b8b6-7c28-44e2-a25e-b6202ba7182c",
+      "name": "HTML to PDF",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "3vER0W4nl4g1GCDV",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Files[0].Url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1264,
+        -336
+      ],
+      "id": "91c6793e-5886-42c8-94ad-be86956c683e",
+      "name": "Download PDF as File"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.email }}",
+        "subject": "={{ $('AI Agent For Invoice').item.json.output.subject }}",
+        "emailType": "text",
+        "message": "={{ $('AI Agent For Invoice').item.json.output.body }}",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1440,
+        -336
+      ],
+      "id": "0aa8f760-9c53-4cec-b82b-5fcf5420de7e",
+      "name": "Send Invoice",
+      "webhookId": "ee85bc17-1c7c-41a3-80f4-6002309c50da",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tcBH6xvyVdN1Xcr0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "invoices",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.id }}"
+            },
+            {
+              "fieldId": "amount",
+              "fieldValue": "={{ $('Edit Fields').item.json.amount }}"
+            },
+            {
+              "fieldId": "currency",
+              "fieldValue": "={{ $('Edit Fields').item.json.currency }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $('Edit Fields').item.json.status }}"
+            },
+            {
+              "fieldId": "issued_at",
+              "fieldValue": "={{ $('Edit Fields').item.json.issued_at }}"
+            },
+            {
+              "fieldId": "due_date",
+              "fieldValue": "={{ $('Edit Fields').item.json.due_date }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -128
+      ],
+      "id": "3e88d90c-8761-4c9d-a49d-bec2e83f6796",
+      "name": "Add Invoice",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1rIV4ShsviQAafgQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "leads",
+        "matchType": "allFilters"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        176
+      ],
+      "id": "4223f305-acf6-47bc-965d-7d41a7ac4a5e",
+      "name": "Get Clients Data",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1rIV4ShsviQAafgQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "913d47d3-0373-45d3-8560-fd721f7577f0",
+              "leftValue": "={{ $json.created_at }}",
+              "rightValue": "={{ new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)}}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "before"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -704,
+        176
+      ],
+      "id": "d9fab03e-4ee0-4291-80ec-3a380444cb6a",
+      "name": "Filter Non Converted Clients"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Loop Over Items').item.json.email }}",
+        "subject": "={{ $json.output.subject }}",
+        "message": "={{ $json.output.body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        176
+      ],
+      "id": "26eb6e73-0fc6-409d-b912-6af9e9eb1465",
+      "name": "Send Follow Up Email",
+      "webhookId": "2a906f1f-9fba-475f-bc09-4195f08c0141",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tcBH6xvyVdN1Xcr0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "invoices",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "pending"
+            },
+            {
+              "keyName": "email_sent",
+              "condition": "is",
+              "keyValue": "null"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        1056
+      ],
+      "id": "d150ff4b-04bc-4e52-8e1c-ff84e33da562",
+      "name": "Get Invoices Data",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1rIV4ShsviQAafgQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "913d47d3-0373-45d3-8560-fd721f7577f0",
+              "leftValue": "={{ $json.due_date }}",
+              "rightValue": "={{$now}}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -896,
+        864
+      ],
+      "id": "e2a805a6-3b34-402a-bebe-1fade8ef24f0",
+      "name": "Filter Late Invoices"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.lead_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        704
+      ],
+      "id": "8796c6b3-4028-4ab9-8839-f0183018f9d8",
+      "name": "Get Client Data by id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1rIV4ShsviQAafgQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a professional invoice email as reminder for the following client and invoice details:\n\nClient Name: {{ $json.name }}\nClient Email: {{ $json.email }}\nInvoice Issued Date: {{ $json.issued_at }}\nTotal Amount: {{ $json.amount }}{{ $json.currency }}\nDue Date: {{ $json.due_date }}\nStatus: {{ $json.status }}\nToday Date: {{ $now }}\n\nFollow the system prompt instructions exactly. Return the output strictly in JSON format\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI assistant for BI Structure, a professional company.  \nWrite a formal and polite reminder email to a client about their overdue invoice.  \n\nInstructions for the email:\n1. Use the client’s name and company in the greeting to make it personalized.  \n2. Mention the invoice number, the original due date, and clearly state that the due date has already passed.  \n3. Politely remind the client that payment is still outstanding.  \n4. Inform them that a late fee has been added because the due date has expired.  \n5. Ask for the payment to be made immediately or within a short specific timeframe (e.g., 7 days).  \n6. Keep the language professional, formal, and easy to understand.  \n7. Close the email respectfully with your company name and website.  \n\nEmail format:\n- Subject line: Clear and professional (e.g., \"Payment Reminder – Invoice [Invoice Number]\")  \n- Greeting: Personalized (e.g., \"Dear [Client Name],\")  \n- Body: Formal reminder, mention invoice details, late fee, and request prompt payment.  \n- Closing: Respectful thank you, followed by company info.  \n\nCompany details for signature:\nBI Structure\nWebsite: https://rao-hamza-tariq.vercel.app/"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        704
+      ],
+      "id": "ceed281a-b83b-4f72-b86e-e2a75dd67cea",
+      "name": "AI Agent For Late Fee"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Client Name:  {{ $json.name }}\nCompany Name: {{ $json.company }}\n\nWrite a proper email",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert email writer who creates professional, persuasive, and easy-to-understand emails to sell AI and chatbot services. Your task is to write a **follow-up reminder email** to a client who was contacted previously. Your emails must:\n\n- Start with a polite greeting and reference the previous contact as a gentle reminder.  \n- Use clear, simple, and formal English suitable for a professional audience. Avoid slang or emojis.  \n- Reiterate how our AI automation and chatbot services solve business problems, such as improving customer support, increasing sales, saving time, and enhancing efficiency.  \n- Include relevant market statistics or industry trends where appropriate to reinforce the value of AI and automation for business growth.  \n- Be concise, persuasive, and easy to read, holding the reader’s attention without being too long.  \n- End with a professional closing, including the sender’s name, title, and website:\n\nRao Hamza Tariq  \nAgentic AI Developer  \nhttps://rao-hamza-tariq.vercel.app/  \n\nAlways focus on the benefits to the client, emphasize problem-solving, and make the email persuasive yet professional. The tone should be polite and considerate, since this is a follow-up to a prior message, encouraging the client to take action."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        176
+      ],
+      "id": "b09edc3e-e4fa-409c-838a-9553290dceb5",
+      "name": "AI Agent For Follow Up"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User name:  {{ $json.body.lead.name }}\nCompany Name: {{ $json.body.lead.company }}\n\nWrite a proper email",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert email writer who creates professional, persuasive, and easy-to-understand emails to sell AI and chatbot services. Convince client to buy our services. Your emails must:\n\nStart with a polite greeting and proper introduction.\n\nUse clear, simple, and formal English suitable for a professional audience. Avoid slang or emojis.\n\nDescribe how our AI automation and chatbot services solve business problems, such as improving customer support, increasing sales, saving time, and enhancing efficiency.\n\nInclude relevant market statistics or industry trends to show the value of AI and automation for business growth.\n\nBe descriptive but concise; the email should hold the reader’s attention without being too long.\n\nEnd with a professional closing, including the sender’s name, title, and website:\n\nRao Hamza Tariq\nAgentic AI Developer\nhttps://rao-hamza-tariq.vercel.app/\n\n\nAlways focus on the benefits to the client, emphasize problem-solving, and make the email persuasive yet easy to read."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -864,
+        -368
+      ],
+      "id": "bfeb8bf3-3fff-42d2-a154-227bdeb9d0f8",
+      "name": "AI Agent For Marketing"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a professional invoice email for the following client and invoice details:\n\nClient Name: {{ $json.name }}\nClient Email: {{ $json.email }}\nInvoice Issued Date: {{ $json.issued_at }}\nTotal Amount: {{ $json.amount }}{{ $json.currency }}\nDue Date: {{ $json.due_date }}\nStatus: {{ $json.status }}\n\nFollow the system prompt instructions exactly. Return the output strictly in JSON format\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert business email writer who creates professional, polite, and easy-to-understand emails for sending invoices to clients. Your emails must:\n\n- Start with a polite greeting, addressing the client by name, and a clear introduction referring to the invoice.\n  \n- Use clear, simple, and formal English suitable for a professional audience. Avoid slang, jokes, or emojis.\n\n- Clearly mention the invoice number, invoice date, total amount due, and payment due date (if available).\n\n- Provide a concise summary of the items/services included in the invoice, without listing excessive details unless necessary.\n\n- Emphasize professionalism, reliability, and courteous communication to maintain good client relations.\n\n- Be descriptive but concise; the email should hold the reader’s attention without being too long.\n\n- End with a professional closing, including the sender’s name, title, and company website, for example:\n\nRao Hamza Tariq\nAgentic AI Developer\nhttps://rao-hamza-tariq.vercel.app/\n\n- Always focus on clarity, accuracy, and professionalism, ensuring the client understands the invoice details and payment expectations.\n\n- Output the email strictly in JSON format with two fields: \n{\n  \"subject\": \"Email subject line here\",\n  \"body\": \"Email body here\"\n}\n\nFollow this pattern consistently for every invoice email you generate.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        -336
+      ],
+      "id": "501aaf71-aa9a-48a4-a7f7-58c875f13acd",
+      "name": "AI Agent For Invoice"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "59904110-bcc6-4956-93d7-c9dd1de5254a",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "b52efa1d-f01e-48e0-853e-3cb16ea23e17",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "47e2f8f8-ad95-4337-b1cf-edae6f3ae4ee",
+              "name": "company",
+              "value": "={{ $json.company }} ",
+              "type": "string"
+            },
+            {
+              "id": "3ef5ddc3-b366-419b-a3b5-76ef6db8290e",
+              "name": "amount",
+              "value": "={{ $('Loop Over Items1').item.json.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "bdc99dc8-63f5-44e4-b8ec-2b624822d4de",
+              "name": "currency",
+              "value": "={{ $('Loop Over Items1').item.json.currency }}",
+              "type": "string"
+            },
+            {
+              "id": "e2941f1a-5574-4038-b35a-25411169ef26",
+              "name": "status",
+              "value": "={{ $('Loop Over Items1').item.json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "5e4d7640-2378-49a5-be0b-03a9cd86ba42",
+              "name": "due_date",
+              "value": "={{ $('Loop Over Items1').item.json.due_date }}",
+              "type": "string"
+            },
+            {
+              "id": "28db763b-9f7a-4d96-9374-db8651c5682c",
+              "name": "issued_at",
+              "value": "={{ $('Loop Over Items1').item.json.issued_at }}",
+              "type": "string"
+            },
+            {
+              "id": "e71875b0-c817-4f8b-a2c9-7e8ac0359f98",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        960
+      ],
+      "id": "870c6539-295a-4a22-9865-e2b564df825d",
+      "name": "Edit Data into Format"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Late Invoice</title>\n  <style>\n    body {\n      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n      margin: 40px;\n      color: #333;\n      background-color: #f9f9f9;\n    }\n    .invoice-box {\n      max-width: 850px;\n      margin: auto;\n      background: #fff;\n      border: 1px solid #ddd;\n      padding: 40px;\n      box-shadow: 0 0 10px rgba(0,0,0,0.1);\n      font-size: 15px;\n      line-height: 22px;\n      color: #444;\n    }\n    .header {\n      display: flex;\n      justify-content: space-between;\n      align-items: flex-start;\n      border-bottom: 2px solid #cc0000;\n      padding-bottom: 20px;\n      margin-bottom: 30px;\n    }\n    .company h2 {\n      margin: 0;\n      color: #cc0000;\n    }\n    .company p {\n      margin: 2px 0;\n    }\n    .invoice-details {\n      text-align: right;\n    }\n    .invoice-details h3 {\n      margin: 0;\n      color: #333;\n    }\n    .invoice-details p {\n      margin: 4px 0;\n    }\n    h3.section-title {\n      margin-top: 30px;\n      margin-bottom: 10px;\n      color: #cc0000;\n      border-bottom: 1px solid #ddd;\n      padding-bottom: 5px;\n    }\n    table {\n      width: 100%;\n      border-collapse: collapse;\n      margin-top: 20px;\n    }\n    table th, table td {\n      border: 1px solid #ddd;\n      padding: 12px;\n      text-align: left;\n    }\n    table th {\n      background-color: #cc0000;\n      color: #fff;\n      font-weight: 600;\n    }\n    table td {\n      background-color: #fafafa;\n    }\n    .totals {\n      margin-top: 30px;\n      float: right;\n      width: 350px;\n    }\n    .totals table {\n      border: none;\n      width: 100%;\n    }\n    .totals td {\n      padding: 8px;\n      text-align: right;\n    }\n    .totals td:first-child {\n      text-align: left;\n    }\n    .totals tr:last-child td {\n      font-size: 16px;\n      font-weight: bold;\n      border-top: 2px solid #cc0000;\n    }\n    .footer {\n      margin-top: 60px;\n      text-align: center;\n      font-size: 13px;\n      color: #777;\n      border-top: 1px solid #ddd;\n      padding-top: 15px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"invoice-box\">\n    <!-- Header -->\n    <div class=\"header\">\n      <div class=\"company\">\n        <h2>BI Structure</h2>\n        <p>Garden West, Karachi, Pakistan</p>\n        <p>Email: bistructure9211@gmail.com</p>\n        <p>Website: <a href=\"https://rao-hamza-tariq.vercel.app/\">https://rao-hamza-tariq.vercel.app/</a></p>\n      </div>\n      <div class=\"invoice-details\">\n        <h3>Overdue Invoice</h3>\n        <p><strong>Client ID:</strong> </p>\n        <p><strong>Issued Date:</strong> {{$('Edit Data into Format').item.json.issued_at}}</p>\n        <p><strong>Due Date:</strong> {{$('Edit Data into Format').item.json.due_date}}</p>\n        <p style=\"color: #cc0000;\"><strong>Status:</strong> Overdue – Late Fee Applied</p>\n      </div>\n    </div>\n\n    <!-- Bill To -->\n    <div>\n      <h3 class=\"section-title\">Bill To</h3>\n      <p><strong>{{$('Edit Data into Format').item.json.name}}</strong></p>\n      <p>{{$('Edit Data into Format').item.json.email}}</p>\n    </div>\n\n    <!-- Items Table -->\n    <table>\n      <tr>\n        <th>Description</th>\n        <th>Qty</th>\n        <th>Unit Price</th>\n        <th>Total</th>\n      </tr>\n      <tr>\n        <td>Service / Product</td>\n        <td>1</td>\n        <td>{{$('Edit Data into Format').item.json.amount}} {{$('Edit Data into Format').item.json.currency}}</td>\n        <td>{{$('Edit Data into Format').item.json.amount}} {{$('Edit Data into Format').item.json.currency}}</td>\n      </tr>\n    </table>\n\n    <!-- Totals -->\n    <div class=\"totals\">\n      <table>\n        <tr>\n          <td>Subtotal:</td>\n          <td>{{$('Edit Data into Format').item.json.amount}} {{$('Edit Data into Format').item.json.currency}}</td>\n        </tr>\n        <tr>\n          <td>Late Fee (2.5%):</td>\n          <td>{{ ($('Edit Data into Format').item.json.amount * 0.025).toFixed(2) }} {{$('Edit Data into Format').item.json.currency}}</td>\n        </tr>\n        <tr>\n          <td>Total Due:</td>\n          <td>{{ ($('Edit Data into Format').item.json.amount * 1.025).toFixed(2) }} {{$('Edit Data into Format').item.json.currency}}</td>\n        </tr>\n      </table>\n    </div>\n    <div style=\"clear: both;\"></div>\n\n    <!-- Footer -->\n    <div class=\"footer\">\n      <p style=\"color: #cc0000;\">This invoice is overdue. Please make payment immediately to avoid further late fees.</p>\n      <p>Thank you for your prompt attention.</p>\n    </div>\n  </div>\n</body>\n</html>\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        704
+      ],
+      "id": "cfdeb5a3-062f-47ac-9a5f-5a10911f91d2",
+      "name": "Late Fee Invoice Template"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.html // your HTML string\nconst base64 = Buffer.from(html).toString('base64');\n\nreturn [\n  {\n    json: {\n      Parameters: [\n        {\n          Name: \"File\",\n          FileValue: {\n            Name: \"my_file.html\",\n            Data: base64\n          }\n        },\n        {\n          Name: \"StoreFile\",\n          Value: true\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        896
+      ],
+      "id": "04854dcb-49d5-4faa-817f-48ef71c0cc80",
+      "name": "HTML to JSON for ConvertAPI"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://v2.convertapi.com/convert/html/to/pdf",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        144,
+        1088
+      ],
+      "id": "211466f6-63c2-4178-aba0-d852f2be709b",
+      "name": "HTML TO PDF",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "3vER0W4nl4g1GCDV",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Files[0].Url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        1088
+      ],
+      "id": "b9d40c8b-53cb-42fb-96d2-f790baf07c27",
+      "name": "Download as File"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$('Edit Data into Format').item.json.email}}",
+        "subject": "={{$('AI Agent For Late Fee').first().json.output.subject}}",
+        "message": "={{$('AI Agent For Late Fee').first().json.output.body}}",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        688
+      ],
+      "id": "5a88ee31-2fb3-4b88-afe5-bd73af6fb320",
+      "name": "Send Late Fee Invoice",
+      "webhookId": "2a906f1f-9fba-475f-bc09-4195f08c0141",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tcBH6xvyVdN1Xcr0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "invoices",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "$('Loop Over Items1').first().json.id"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "email_sent",
+              "fieldValue": "={{true}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        592,
+        800
+      ],
+      "id": "5698d029-8d9d-496a-b345-b80b914327ba",
+      "name": "Update the Invoice Table",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1rIV4ShsviQAafgQ",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent For Marketing",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent For Marketing",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Clients Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent For Follow Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent For Follow Up",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent For Follow Up",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get Invoices Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Client Data by id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent For Late Fee",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent For Late Fee",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent For Invoice",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent For Invoice",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Email Creation in Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leads Creation Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent For Marketing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Creation Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client Data": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent For Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Template": {
+      "main": [
+        [
+          {
+            "node": "JSON for ConvertAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON for ConvertAPI": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Download PDF as File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download PDF as File": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invoice": {
+      "main": [
+        [
+          {
+            "node": "Add Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Clients Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Non Converted Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Non Converted Clients": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Follow Up Email": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Invoices Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Late Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Late Invoices": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client Data by id": {
+      "main": [
+        [
+          {
+            "node": "Edit Data into Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent For Late Fee": {
+      "main": [
+        [
+          {
+            "node": "Late Fee Invoice Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent For Follow Up": {
+      "main": [
+        [
+          {
+            "node": "Send Follow Up Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent For Marketing": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent For Invoice": {
+      "main": [
+        [
+          {
+            "node": "Invoice Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Data into Format": {
+      "main": [
+        [
+          {
+            "node": "AI Agent For Late Fee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Late Fee Invoice Template": {
+      "main": [
+        [
+          {
+            "node": "HTML to JSON for ConvertAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to JSON for ConvertAPI": {
+      "main": [
+        [
+          {
+            "node": "HTML TO PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML TO PDF": {
+      "main": [
+        [
+          {
+            "node": "Download as File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download as File": {
+      "main": [
+        [
+          {
+            "node": "Send Late Fee Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Late Fee Invoice": {
+      "main": [
+        [
+          {
+            "node": "Update the Invoice Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update the Invoice Table": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "502076b6-e4bf-4d94-8bcc-21c2c6d8a7d9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b8826675eaa3e37ba9ee7313c11bd51f8587f4fcbc72e19aae98408b19d8315c"
+  },
+  "id": "10LXvE92XXDPy3ze",
+  "tags": []
+}

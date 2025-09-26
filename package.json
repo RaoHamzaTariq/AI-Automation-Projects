@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "n8n": "^1.112.4"
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.57.4",
+    "n8n": "^1.112.4",
+    "recharts": "^3.2.1"
   }
 }
