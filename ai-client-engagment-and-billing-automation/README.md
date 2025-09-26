@@ -12,7 +12,7 @@ A clean dashboard where staff can:
 - Create invoices linked to clients
 - Track payments and outstanding dues
 
-![Dashboard Screenshot](/public/Dashboard Page.png)
+![Dashboard Screenshot](/public/Dashboard%20Page.png)
 
 ### Automation Workflows
 n8n workflows handle client emails, invoices, and payment reminders automatically.
