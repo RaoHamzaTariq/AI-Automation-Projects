@@ -12,12 +12,12 @@ A clean dashboard where staff can:
 - Create invoices linked to clients
 - Track payments and outstanding dues
 
-![Dashboard Screenshot](public/Images/Dashboard%20Page.png)
+![Dashboard Screenshot](public/Dashboard%20Page.png)
 
 ### Automation Workflows
 n8n workflows handle client emails, invoices, and payment reminders automatically.
 
-![Workflow Screenshot](/public/AI%20Invoive%20and%20Payment%20Automation.PNG)
+![Workflow Screenshot](public/AI%20Invoive%20and%20Payment%20Automation.PNG)
 
 ---
 
@@ -51,9 +51,10 @@ This system **automates the entire cycle**:
 - The system automatically sends a **welcome email**.  
 - This builds trust and keeps engagement fast.  
 
-![Send Welcome Emails to New Leads Pic](/public/Send%20Email%20to%20Lead.PNG)
+![Send Welcome Emails to New Leads Pic](public/Send%20Email%20to%20Lead.PNG)
 
-![](/public//Leads%20Management%20Page.png)
+![Lead Management Page](public/Leads%20Management%20Page.png)
+
 ---
 
 ### 2. Follow-Up Emails
@@ -61,9 +62,9 @@ This system **automates the entire cycle**:
 - The system automatically sends a **follow-up email**.  
 - This increases the chance of converting leads without manual effort.  
 
-![Follow-up Emails Pic](/public/Follows%20Up%20Email.PNG)
+![Follow-up Emails Pic](public/Follows%20Up%20Email.PNG)
 
-![](/public/Email%20Campaign%20Page.png)
+![Email Campaigns Page](public/Email%20Campaign%20Page.png)
 
 ---
 
@@ -74,9 +75,10 @@ This system **automates the entire cycle**:
   - Sends it to the client by email instantly  
 - The invoice is tracked automatically.  
 
-![Invoice Creation Pic](/public/Invoice%20Flow.PNG)
+![Invoice Creation Pic](public/Invoice%20Flow.PNG)
 
-![](/public//Invoice%20Management%20Page.png)
+![Invoice Management Page](public//Invoice%20Management%20Page.png)
+
 ---
 
 ### 4. Payment Reminders
@@ -84,9 +86,10 @@ This system **automates the entire cycle**:
 - After the due date: The AI system sends a **late fee invoice** as a PDF attachment with email.  
 - This ensures payments are not forgotten.  
 
-![Payment Reminders](/public/Invoice%20Reminder%20After%20Due%20Date.PNG)
+![Payment Reminders](public/Invoice%20Reminder%20After%20Due%20Date.PNG)
 
-![](/public/Transaction%20History%20Page.png)
+![Transaction History Page](public/Transaction%20History%20Page.png)
+
 ---
 
 ## Real Use Case Example
