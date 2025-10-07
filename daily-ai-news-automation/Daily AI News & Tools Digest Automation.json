@@ -206,30 +206,6 @@
     },
     {
       "parameters": {
-        "sendTo": "raohamza6767@gmail.com",
-        "subject": "AI Image",
-        "message": "=<img src=\"https://images.ctfassets.net/jdtwqhzvc2n1/4Glss6wFaZ4by6Tf3rOX9S/262f49bd913d24e09837c14557fa3016/u7277289442_Sophsticated_AI_bots_sit_alongside_humans_at_mode_c6808a94-8ddf-4f76-8761-a77d9b192a0f_3.png\" alt=\"Italian Trulli\">",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.1,
-      "position": [
-        32,
-        528
-      ],
-      "id": "f91231a5-14df-416b-868e-eb37d036cfea",
-      "name": "Send a message",
-      "webhookId": "5fe48634-403f-492b-80bd-25603e2fe8ce",
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "LmzBR0OxZ5c0xiw4",
-          "name": "Gmail account"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
         "numberInputs": 3
       },
       "type": "n8n-nodes-base.merge",
@@ -636,7 +612,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "8b253073-a153-4f98-a2d8-d6c408591f7b",
+  "versionId": "4fd142d0-8baa-4cc4-b2fd-ac30a0ddb71b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f285dfe561c593deb56ec4a741dc8983520f02c2e96da100daec94bef725c70c"
