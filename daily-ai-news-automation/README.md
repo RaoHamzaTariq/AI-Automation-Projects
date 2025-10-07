@@ -4,6 +4,8 @@
 
 ---
 
+![Daily AI News Automation](/images/daily-ai-news-automation.PNG)
+
 ## Overview
 
 In a world where **AI innovation moves faster than ever**, keeping up with the latest tools, research, and breakthroughs is critical — yet time-consuming.
