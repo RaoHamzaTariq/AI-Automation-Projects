@@ -1,0 +1,1210 @@
+{
+  "name": "WhatsApp Doctor Clinic Appointment Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "=You are an AI Assistant for a Doctor Clinic.\nYour job is to manage appointments via WhatsApp and ensure all data is accurately stored in Google Sheets.\nYou must always:\n\nSave patients and appointments in Google Sheets.\n\nConfirm a booking only after the row is successfully added.\n\nHandle payments via Stripe or Cash at Clinic.\n\nBe polite, WhatsApp-friendly, and guide step by step.\n\n🔹 Core Workflow\n1. Greeting & Main Menu\n\nWhen user messages first time or greet, send this menu:\n\nHello, Welcome to Doctor Clinic!  \nPlease choose an option:  \n\n1. New Booking  \n2. My Upcoming Bookings  \n3. Reschedule Booking  \n4. Cancel Booking\n\n\nWait for response.\n\n2. New Booking Flow\n(a) Patient Lookup\n\nFirst get the patients for specific user by using tool (Get Patient List for User).\n\nIf found → Show patient list.\n\nIf not found or user chooses \"Add New Patient\":\n\nAsk Name, Age, Gender.\n\nSave in Patients sheet → patient_id, whatsapp_number, name, age, gender.\n\nShow updated patient list with patient_id.\n\nAsk which patient to use.\n\n(b) Date Selection\n\nCurrent Time: {{ $now }}.\n\nGenerate next 7 days (today + 6).\n\nExclude fully booked days.\n\nAsk user to choose a date.\n\n(c) Time Slot Selection\n\nFor chosen date, fetch working hours from Config sheet.\n\nSplit into 60-min slots.\n\nRemove:\n\nalready booked slots (Appointments sheet),\n\nunavailable slots (Config sheet),\n\npast slots (if today).\n\nShow available slots.\n\nAsk user to pick one.\n\n(d) Payment Options\n\nAsk:\n\nHow would you like to pay?\n\n1. Online (Stripe)  \n2. Cash at Clinic\n\n(e) Booking Confirmation\n\nWhen user picks slot + payment:\n\nAdd row to Appointments table of database with:\n\nappointment_id, patient_id, whatsapp_number, date, time, payment_method, payment_status, status, stripe_payment_intent (if applicable)\n\n\n✅ Only after saving successfully adding to the database, send confirmation:\n\nAppointment booked! 🎉  \nPatient: {name}  \nDate: {date}  \nTime: {time}  \nPayment Method: {method}  \nPayment Status: Not Paid  \nStatus: Confirmed\n\n3. My Upcoming Bookings\n\nFetch future appointments from Appointments sheet.\n\nShow with patient name, date, and time.\n\n4. Reschedule Booking\n\nFetch user’s future confirmed appointments using tool \"Get Users Appointments\".\n\nShow list with appointment_id, patient, date, time.\n\nAsk which one to reschedule.\n\nRepeat date + slot selection flow.\n\nUpdate Appointments table row with new date & time using tool \"Reschedule Appointment\".\n\nConfirm with new details.\n\n\n5. Cancel Booking\n\nFetch future appointments using tool \"Get Users Appointments\".\n\nShow with appointment_id, date, time.\n\nAsk which one to cancel.\n\nUpdate Appointments table → status=Cancelled using the tool \"Cancel Appointment\".\n\nSend:\n\nYour appointment on {date} at {time} has been cancelled.\n\n🔹 Database Structure\n\nPatients → patient_id, whatsapp_number, name, age, gender\n\nAppointments → appointment_id, patient_id, whatsapp_number, date, time, payment_method, payment_status, status, stripe_payment_intent\n\nConfig → key, value (e.g., working_hours=10:00-18:00)\n\n🔹 Memory Rules\n\nAlways remember last step (patient, date, slot, payment).\n\nIf invalid input:\n\nSorry, I didn’t understand that. Please reply with one of the given options.\n\n\nIf user returns later, continue from last step.\n\nStyle Guide\n\nMultiple patients allowed per WhatsApp number.\n\nKeep messages short, clear, WhatsApp-style.\n\nAlways confirm after saving to sheet.\n\nUse numbers for menu options.\n\nKey Fix:\nThe critical update is:\n\n“Only after saving to Appointments sheet, send confirmation message.”"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -48,
+        896
+      ],
+      "id": "c96ac13c-18a0-4499-8155-6ea71f226ab4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        1088
+      ],
+      "id": "1dc0e48c-62d7-4293-a534-5a8dccce5d23",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6X9WcwPzfcXZXQJw",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        896
+      ],
+      "id": "94dd71ea-a5a1-41e7-9271-85eb24178c2e",
+      "name": "WhatsApp Trigger",
+      "webhookId": "e1b69c1e-0e53-40ab-a80b-95ed3de83a2e",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "4wuKIwnt2xuX8sJL",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "838801129305972",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        304,
+        896
+      ],
+      "id": "a935555b-43f9-4c08-9b12-d5e99ec60c79",
+      "name": "Send message",
+      "webhookId": "7cbb9d53-94f4-4573-9cba-399a8d024c86",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "7muLU88mwCfMmR49",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "838801129305972",
+        "recipientPhoneNumber": "={{ $json.data[0].metadata.whatsappNo.toString() }}",
+        "textBody": "=Your Payment has received using Stripe for appointment id  {{ $json.data[0].metadata.appointment_id }}\n\nThank you for booking an appointment with us.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        208,
+        96
+      ],
+      "id": "7e2d10a6-4429-4fdc-b592-6377621f91bd",
+      "name": "Send Confirmation for Payment",
+      "webhookId": "e87161c4-4f3f-4b53-9d0f-6f97fdd1d8ce",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "7muLU88mwCfMmR49",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.stripe.com/v1/checkout/sessions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "payment_intent",
+              "value": "={{$json.data.object.id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        176
+      ],
+      "id": "90e41c76-33d1-4f79-9d26-826657a79068",
+      "name": "Get Payment Data"
+    },
+    {
+      "parameters": {
+        "events": [
+          "payment_intent.succeeded"
+        ]
+      },
+      "type": "n8n-nodes-base.stripeTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        176
+      ],
+      "id": "84521dab-d034-492f-ad0b-4fdfe80a1876",
+      "name": "On Payment Succeed",
+      "webhookId": "9f9e9874-dc3a-49c5-ba5f-aee0833cbfd1",
+      "credentials": {
+        "stripeApi": {
+          "id": "FD2YOCJzKUDnB5C2",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Doctor Clinic Appointment Workflow\nUser can easily book, reschedule and cancel appointment. This also support the refund.",
+        "height": 672,
+        "width": 1456
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        784
+      ],
+      "id": "d7925da8-d76c-4b1e-a8fe-0227c693b721",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Cancelled Appointment Workflow\nThis checks the cancel appointment and refund the payment amount",
+        "height": 496,
+        "width": 1200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        592,
+        160
+      ],
+      "id": "77180014-1d19-4a21-9675-c267e7b2adbb",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Accept Payment Workflow\nThis accepts the payment and notify the user.",
+        "height": 384,
+        "width": 848
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        48
+      ],
+      "id": "a3b0a5cd-efc8-4964-b51b-cd49c5582578",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Create Payment Workflow\nThis creates the stripe payment and send it to user.\n",
+        "height": 240,
+        "width": 1040
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        464
+      ],
+      "id": "0bd74773-92e1-477d-bd78-175282037c6c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "config",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        1280
+      ],
+      "id": "bbeccac1-f2b8-44ce-bb3d-73d573a02e8a",
+      "name": "Doctor Config",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "patients",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "whatsapp_number",
+              "condition": "eq",
+              "keyValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        1280
+      ],
+      "id": "2f938507-a9bf-4d44-8aa2-3135838a0549",
+      "name": "Get Patient List for User",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "patients",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "whatsapp_number",
+              "fieldValue": "={{$('WhatsApp Trigger').item.json.contacts[0].wa_id}}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "age",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "gender",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "patient_id",
+              "fieldValue": "={{$now.toMillis()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        1280
+      ],
+      "id": "2e02453f-5863-4496-a980-2d1a42d8b8e9",
+      "name": "Add Patient",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "appointments",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "whatsapp_number",
+              "condition": "eq",
+              "keyValue": "={{$('WhatsApp Trigger').item.json.contacts[0].wa_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        112,
+        1280
+      ],
+      "id": "5494a199-c5ab-4641-9dcc-4cfbe72f02c2",
+      "name": "Get Users Appointments",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Always use this tool to save appointments to the database. ",
+        "tableId": "appointments",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "appointment_id",
+              "fieldValue": "={{$now.toMillis()}}"
+            },
+            {
+              "fieldId": "patient_id",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "whatsapp_number",
+              "fieldValue": "={{$('WhatsApp Trigger').item.json.contacts[0].wa_id}}"
+            },
+            {
+              "fieldId": "date",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "time",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues4_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "payment_method",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues5_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "payment_status",
+              "fieldValue": "Pending"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "Confirmed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        240,
+        1280
+      ],
+      "id": "210b8d60-3294-4429-9353-dab0edb1ab73",
+      "name": "Add Appointment",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "appointments",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "whatsapp_number",
+              "condition": "eq",
+              "keyValue": "={{$('WhatsApp Trigger').item.json.contacts[0].wa_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        368,
+        1280
+      ],
+      "id": "398f1178-28ec-4921-b0ac-80e65f8b1a7d",
+      "name": "Get All Appointments",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "appointment_id",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Field_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "date",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "time",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues4_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1280
+      ],
+      "id": "dc573999-c027-4690-ae3f-8247a2b244c5",
+      "name": "Reschedule Appointment",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "appointment_id",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Field_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "Cancelled"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        608,
+        1280
+      ],
+      "id": "ab467644-0c15-4da8-a5d2-b7da4d45a23d",
+      "name": "Cancel Appointment",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "appointment_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.data[0].metadata.appointment_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "payment_status",
+              "fieldValue": "Paid"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "Confirmed"
+            },
+            {
+              "fieldId": "stripe_payment_intent",
+              "fieldValue": "={{ $json.data[0].payment_intent }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        272
+      ],
+      "id": "a0bc2c88-6c32-4f39-8e20-68e22a01f377",
+      "name": "Update Payment Status",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment_creation",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        560
+      ],
+      "id": "b158f308-8197-46ba-8a1c-9f9627fab593",
+      "name": "On Appointment Booking",
+      "webhookId": "c0aea2db-fdc8-41ae-a003-d522660f5be6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "24490b44-c13b-4ca9-8809-a8379e88cff1",
+              "leftValue": "={{ $json.body.record.payment_method.toLowerCase() }}",
+              "rightValue": "stripe",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "b04e7833-3aa9-4ddb-b291-04adbbc5114d",
+              "leftValue": "={{ $json.body.type.toLowerCase() }}",
+              "rightValue": "insert",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        560
+      ],
+      "id": "31e0a2b6-bb1a-4afe-b6bf-adfcf4c20986",
+      "name": "If Payment is Stripe"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "838801129305972",
+        "recipientPhoneNumber": "={{ $json.metadata.whatsappNo.toString() }}",
+        "textBody": "=This is the link of payment for your appointment id {{ $('On Appointment Booking').item.json.body.record.appointment_id }}\n\n{{ $json.url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        256,
+        544
+      ],
+      "id": "2e6b1e4d-d961-4b9e-b379-ca87f11a6b3a",
+      "name": "Send Payment Link",
+      "webhookId": "59302c6d-8e62-4ac7-ab45-e435ff3681d9",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "7muLU88mwCfMmR49",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.stripe.com/v1/checkout/sessions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "metadata[appointment_id]",
+              "value": "={{ $json.body.record.appointment_id }}"
+            },
+            {
+              "name": "line_items[0][quantity]",
+              "value": "1"
+            },
+            {
+              "name": "line_items[0][price_data][product_data][name]",
+              "value": "Appointment Booking"
+            },
+            {
+              "name": "line_items[0][price_data][unit_amount]",
+              "value": "5000"
+            },
+            {
+              "name": "line_items[0][price_data][currency]",
+              "value": "usd"
+            },
+            {
+              "name": "mode",
+              "value": "payment"
+            },
+            {
+              "name": "success_url",
+              "value": "https://wa.me/15551566902"
+            },
+            {
+              "name": "cancel_url",
+              "value": "https://wa.me/15551566902"
+            },
+            {
+              "name": "metadata[whatsappNo]",
+              "value": "={{ $json.body.record.whatsapp_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        544
+      ],
+      "id": "29155561-8e9c-4708-a5fd-4d6398259555",
+      "name": "Create Payment Link"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "99d4ee98-6229-4930-968e-9835633eb56d",
+              "leftValue": "={{ $json.body.record.status.toLowerCase() }}",
+              "rightValue": "cancelled",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e2b629de-78b1-4780-86e3-7254282fd355",
+              "leftValue": "={{ $json.body.type.toLowerCase() }}",
+              "rightValue": "update",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        320
+      ],
+      "id": "23f6de17-e4d1-4e3a-b048-11323e10e2c6",
+      "name": "Check Status1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "appointment_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Check Payment has Made').item.json.body.record.appointment_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "payment_status",
+              "fieldValue": "refunded"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        304
+      ],
+      "id": "d8484a9c-e189-45e4-bcd0-da774cb02598",
+      "name": "Update Refund Status",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RdoIhOLCYBtYwur1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "on_cancelled_appointment",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        320
+      ],
+      "id": "90e40b79-af2b-45d6-ba8c-7774741a5628",
+      "name": "On Cancelled Appointment",
+      "webhookId": "c0aea2db-fdc8-41ae-a003-d522660f5be6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.stripe.com/v1/refunds",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "payment_intent",
+              "value": "={{ $('Check Payment has Made').item.json.body.record.stripe_payment_intent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1312,
+        304
+      ],
+      "id": "6c3b714c-53e8-4c43-9011-4fd3e65f7e03",
+      "name": "Refund Payment"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "838801129305972",
+        "recipientPhoneNumber": "={{ $json.body.record.whatsapp_number.toString() }}",
+        "textBody": "=Your appointment id {{ $json.body.record.appointment_id }} has cancelled.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        448
+      ],
+      "id": "08d1c8ce-9097-4da9-9713-b07b4e3f4915",
+      "name": "Cancelled Appointment Message",
+      "webhookId": "3230e3ff-4801-4be0-94e5-08b33e2dc1ac",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "7muLU88mwCfMmR49",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "838801129305972",
+        "recipientPhoneNumber": "={{ $('Check Payment has Made').item.json.body.record.whatsapp_number.toString() }}",
+        "textBody": "=Your appointment id {{ $('Check Payment has Made').item.json.body.record.appointment_id }} has cancelled and the refune has been initiated.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        464
+      ],
+      "id": "5c83159b-12b3-4f6b-8ee8-5d242cfea401",
+      "name": "Refund Message",
+      "webhookId": "3230e3ff-4801-4be0-94e5-08b33e2dc1ac",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "7muLU88mwCfMmR49",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b9292a0f-ae6d-4b0f-bc21-4a33cd33c272",
+              "leftValue": "={{ $json.body.record.stripe_payment_intent }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        320
+      ],
+      "id": "30ede0da-4c97-484a-bb55-1afcb0b5c155",
+      "name": "Check Payment has Made"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=123",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        1072
+      ],
+      "id": "d09d4a29-9962-41e6-a050-26f8516a2714",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Payment Data": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation for Payment",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Payment Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Payment Succeed": {
+      "main": [
+        [
+          {
+            "node": "Get Payment Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Doctor Config": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Patient List for User": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Patient": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Users Appointments": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Appointments": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reschedule Appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel Appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Appointment Booking": {
+      "main": [
+        [
+          {
+            "node": "If Payment is Stripe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Payment is Stripe": {
+      "main": [
+        [
+          {
+            "node": "Create Payment Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Payment Link": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status1": {
+      "main": [
+        [
+          {
+            "node": "Check Payment has Made",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Cancelled Appointment": {
+      "main": [
+        [
+          {
+            "node": "Check Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refund Payment": {
+      "main": [
+        [
+          {
+            "node": "Update Refund Status",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Refund Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Payment has Made": {
+      "main": [
+        [
+          {
+            "node": "Refund Payment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cancelled Appointment Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0a1a922a-7112-451d-8a1b-05058fd81df1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f285dfe561c593deb56ec4a741dc8983520f02c2e96da100daec94bef725c70c"
+  },
+  "id": "nx29Vj6ZcN122Y0B",
+  "tags": []
+}
