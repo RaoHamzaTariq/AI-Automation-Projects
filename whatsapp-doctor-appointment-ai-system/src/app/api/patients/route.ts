@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || '100')
     const search = searchParams.get('search')
 
     let query = supabase
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,whatsapp_number.ilike.%${search}%`)
+      query = query.or(`name.ilike.%${search}%,whatsapp_number.ilike.%${search}%,patient_id.ilike.%${search}%`)
     }
 
     const from = (page - 1) * limit
@@ -35,6 +35,31 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error in patients API:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    
+    const { data, error } = await supabase
+      .from('patients')
+      .insert([{
+        ...body,
+        created_at: new Date().toISOString()
+      }])
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error creating patient:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error('Error in patients POST API:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,54 +1,108 @@
+'use client'
+
 import { StatsCards } from '@/components/dashboard/stats-cards'
 import { RecentAppointments } from '@/components/dashboard/recent-appointments'
 import { AppointmentCalendar } from '@/components/dashboard/appointment-calendar'
 import { DashboardStats, Appointment } from '@/lib/types'
+import { useEffect, useState } from 'react'
 
-async function getDashboardStats(): Promise<DashboardStats> {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/analytics`, {
-      cache: 'no-store'
-    })
-    
-    if (!res.ok) {
-      throw new Error(`Failed to fetch dashboard stats: ${res.status}`)
-    }
-    
-    return await res.json()
-  } catch (error) {
-    console.error('Error fetching dashboard stats:', error)
-    // Return default values if API fails
-    return {
-      totalAppointments: 0,
-      todayAppointments: 0,
-      totalPatients: 0,
-      revenue: 0
+export default function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats>({
+    totalAppointments: 0,
+    todayAppointments: 0,
+    totalPatients: 0,
+    revenue: 0
+  })
+  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      console.log('🔄 Starting to fetch dashboard data...')
+
+      // Fetch recent appointments sorted by created_at (newest first)
+      const [statsRes, appointmentsRes] = await Promise.all([
+        fetch('/api/analytics'),
+        fetch('/api/appointments?limit=5&sortBy=created_at&sortOrder=desc')
+      ])
+
+      console.log('📊 Stats response status:', statsRes.status)
+      console.log('📅 Appointments response status:', appointmentsRes.status)
+
+      if (!statsRes.ok) {
+        throw new Error(`Stats API failed: ${statsRes.status}`)
+      }
+
+      if (!appointmentsRes.ok) {
+        throw new Error(`Appointments API failed: ${appointmentsRes.status}`)
+      }
+
+      const statsData = await statsRes.json()
+      const appointmentsData = await appointmentsRes.json()
+
+      console.log('📈 Stats data received:', statsData)
+      console.log('🗓️ Appointments data received:', appointmentsData)
+
+      // Use the actual data structure from API
+      if (statsData.stats) {
+        setStats(statsData.stats)
+      } else {
+        setStats(statsData)
+      }
+      
+      setAppointments(appointmentsData.appointments || [])
+
+    } catch (error) {
+      console.error('❌ Error fetching dashboard data:', error)
+      setError(error instanceof Error ? error.message : 'Unknown error occurred')
+    } finally {
+      setLoading(false)
     }
   }
-}
 
-async function getRecentAppointments(): Promise<Appointment[]> {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/appointments?limit=5`, {
-      cache: 'no-store'
-    })
-    
-    if (!res.ok) {
-      throw new Error(`Failed to fetch recent appointments: ${res.status}`)
-    }
-    
-    const data = await res.json()
-    return data.appointments || []
-  } catch (error) {
-    console.error('Error fetching recent appointments:', error)
-    return []
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-2">Loading dashboard data...</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-gray-200 rounded-lg h-32 animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    )
   }
-}
 
-export default async function DashboardPage() {
-  const [stats, appointments] = await Promise.all([
-    getDashboardStats(),
-    getRecentAppointments()
-  ])
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+            <p className="text-red-800 font-semibold">Error Loading Data</p>
+            <p className="text-red-600 text-sm mt-1">{error}</p>
+            <button
+              onClick={fetchDashboardData}
+              className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
